@@ -22,14 +22,15 @@ def generate_image_with_prompt(prompt):
     """
     try:
         # Call Together AI for image generation
-        response = client.image_generations.create(
-            model="meta-diffusion/Diffusion-2.1",  # Text-to-image model
+        response = client.images.generate(
+            model="stabilityai/stable-diffusion-xl-base-1.0",  # Text-to-image model
             prompt=prompt,
+            steps=50,
             options={"size": "512x512"}  # Specify image size (optional)
         )
 
         # Extract image URL from the response
-        image_url = response.image_url
+        image_url = response.data[0].url
         return image_url
 
     except Exception as e:
