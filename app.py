@@ -1,13 +1,10 @@
 # Import necessary libraries
 import streamlit as st
 import os
-from together import Together
+import requests
 
 # Set your Together API key (ensure it's stored securely in Streamlit Secrets)
 os.environ['TOGETHER_API_KEY'] = st.secrets["TOGETHER_API_KEY"]
-
-# Initialize Together client
-client = Together()
 
 # Function to generate an image based on a text prompt
 def generate_image_with_prompt(prompt):
@@ -18,21 +15,23 @@ def generate_image_with_prompt(prompt):
     prompt (str): A plain-text description of the desired image.
 
     Returns:
-    str: URL or data of the generated image, or an error message.
+    str: URL of the generated image, or an error message.
     """
+    api_key = os.getenv('TOGETHER_API_KEY')
+    url = "https://api.together.xyz/v1/images/generate"
+    headers = {
+        "Authorization": f"Bearer {api_key}"
+    }
+    payload = {
+        "model": "stabilityai/stable-diffusion-xl-base-1.0",
+        "prompt": prompt,
+        "steps": 50
+    }
+
     try:
-        # Call Together AI for image generation
-        response = client.images.generate(
-            model="stabilityai/stable-diffusion-xl-base-1.0",  # Text-to-image model
-            prompt=prompt,
-            steps=50,
-            options={"size": "512x512"}  # Specify image size (optional)
-        )
-
-        # Extract image URL from the response
-        image_url = response.data[0].url
-        return image_url
-
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return response.json()["data"][0]["url"]
     except Exception as e:
         return f"Error generating image: {e}"
 
