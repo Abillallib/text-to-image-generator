@@ -1,7 +1,7 @@
 # Import necessary libraries
 import streamlit as st
 import os
-import requests
+from together import Together
 
 # Set your Together API key (ensure it's stored securely in Streamlit Secrets)
 os.environ['TOGETHER_API_KEY'] = st.secrets["TOGETHER_API_KEY"]
